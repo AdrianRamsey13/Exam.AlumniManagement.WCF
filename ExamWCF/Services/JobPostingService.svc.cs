@@ -325,8 +325,8 @@ namespace ExamWCF.Services
                         command.Parameters.Add(new SqlParameter("@IsClosed", SqlDbType.Bit) { Value = (object)jobPosting.IsClosed ?? DBNull.Value });
                         command.Parameters.Add(new SqlParameter("@ModifiedDate", SqlDbType.DateTime) { Value = DateTime.Now });
 
-                        command.Parameters.Add(new SqlParameter("@JobSkills", SqlDbType.Structured) { TypeName = "dbo.JobSkillsType", Value = jobSkills });
-                        command.Parameters.Add(new SqlParameter("@JobAttachmentTypes", SqlDbType.Structured) { TypeName = "dbo.JobAttachmentTypesType", Value = jobAttachmentTypes });
+                        command.Parameters.Add(new SqlParameter("@JobSkill", SqlDbType.Structured) { TypeName = "dbo.JobSkillType", Value = jobSkills });
+                        command.Parameters.Add(new SqlParameter("@JobAttachmentType", SqlDbType.Structured) { TypeName = "dbo.JobAttachmentTypeType", Value = jobAttachmentTypes });
 
                         connection.Open();
                         command.ExecuteNonQuery();

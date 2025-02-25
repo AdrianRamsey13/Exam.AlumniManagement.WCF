@@ -40,7 +40,7 @@ namespace ExamWCF.Services
                             JobID = ja.JobID,
                             AlumniID = ja.AlumniID,
                             AlumniName = a.FirstName + " " + a.LastName,
-                            ApplyDate = a.ModifiedDate,
+                            //ApplyDate = a.ModifiedDate,
                             FileName = ja.FileName,
                             FilePath = ja.FilePath
                         };
