@@ -39,5 +39,8 @@ namespace ExamWCF.Services
         int GetDistrictIDByName(string districtName);
         [OperationContract]
         void ImportFromExcel(AlumniDTO alumni);
+
+        [OperationContract]
+        void UpsertAlumni(AlumniDTO alumni);
     }
 }

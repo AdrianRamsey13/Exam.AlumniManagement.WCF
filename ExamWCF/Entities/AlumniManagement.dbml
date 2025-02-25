@@ -95,6 +95,7 @@
       <Association Name="Alumni_AlumniImage" Member="AlumniImages" ThisKey="AlumniID" OtherKey="AlumniID" Type="AlumniImage" />
       <Association Name="Alumni_AlumniHobby" Member="AlumniHobbies" ThisKey="AlumniID" OtherKey="AlumniID" Type="AlumniHobby" />
       <Association Name="Alumni_JobAttachment" Member="JobAttachments" ThisKey="AlumniID" OtherKey="AlumniID" Type="JobAttachment" />
+      <Association Name="Alumni_JobCandidate" Member="JobCandidates" ThisKey="AlumniID" OtherKey="AlumniID" Type="JobCandidate" />
       <Association Name="District_Alumni" Member="District" ThisKey="DistrictID" OtherKey="DistrictID" Type="District" IsForeignKey="true" />
       <Association Name="Major_Alumni" Member="Major" ThisKey="MajorID" OtherKey="MajorID" Type="Major" IsForeignKey="true" />
     </Type>
@@ -142,6 +143,7 @@
       <Association Name="JobPosting_JobAttachment" Member="JobAttachments" ThisKey="JobID" OtherKey="JobID" Type="JobAttachment" />
       <Association Name="JobPosting_JobAttachmentType" Member="JobAttachmentTypes" ThisKey="JobID" OtherKey="JobID" Type="JobAttachmentType" />
       <Association Name="JobPosting_JobSkill" Member="JobSkills" ThisKey="JobID" OtherKey="JobID" Type="JobSkill" />
+      <Association Name="JobPosting_JobCandidate" Member="JobCandidates" ThisKey="JobID" OtherKey="JobID" Type="JobCandidate" />
       <Association Name="EmploymentType_JobPosting" Member="EmploymentType" ThisKey="EmploymentTypeID" OtherKey="EmploymentTypeID" Type="EmploymentType" IsForeignKey="true" />
     </Type>
   </Table>
@@ -167,6 +169,15 @@
       <Column Name="SkillID" Type="System.Byte" DbType="TinyInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Association Name="JobPosting_JobSkill" Member="JobPosting" ThisKey="JobID" OtherKey="JobID" Type="JobPosting" IsForeignKey="true" />
       <Association Name="Skill_JobSkill" Member="Skill" ThisKey="SkillID" OtherKey="SkillID" Type="Skill" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.JobCandidate" Member="JobCandidates">
+    <Type Name="JobCandidate">
+      <Column Name="AlumniID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="JobID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ApplyDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Alumni_JobCandidate" Member="Alumni" ThisKey="AlumniID" OtherKey="AlumniID" Type="Alumni" IsForeignKey="true" />
+      <Association Name="JobPosting_JobCandidate" Member="JobPosting" ThisKey="JobID" OtherKey="JobID" Type="JobPosting" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

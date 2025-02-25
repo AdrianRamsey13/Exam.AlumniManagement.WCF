@@ -68,5 +68,18 @@ namespace ExamWCF.DTOs
         public string PhotoName { get; set; }
 
         public string PhotoPath { get; set; }
+
+        public System.Nullable<System.DateTime> ApplyDate { get; set; }
+        public List<AttachmentDTO> Attachments { get; set; }
+
     }
-}
+
+    public class AttachmentDTO
+    {
+        public string FileName { get; set; }
+        public string FilePath
+        {
+            get; set;
+        }
+    }
+}   

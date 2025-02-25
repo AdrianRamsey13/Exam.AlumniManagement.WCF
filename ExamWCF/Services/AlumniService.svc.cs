@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -132,21 +134,73 @@ namespace ExamWCF.Services
             _dataContext.Alumnis.InsertOnSubmit(data);
             _dataContext.SubmitChanges();
 
-            int totalHobbies = alumni.SelectedHobbies.Count;
-            if (totalHobbies > 0)
+            if (alumni.SelectedHobbies != null)
             {
-                foreach (var item in alumni.SelectedHobbies)
+                int totalHobbies = alumni.SelectedHobbies.Count;
+                if (totalHobbies > 0)
                 {
-                    AlumniHobby alumniHobby = new AlumniHobby
+                    foreach (var item in alumni.SelectedHobbies)
                     {
-                        AlumniID = data.AlumniID,
-                        HobbyID = item
-                    };
-                    _dataContext.AlumniHobbies.InsertOnSubmit(alumniHobby);
+                        AlumniHobby alumniHobby = new AlumniHobby
+                        {
+                            AlumniID = data.AlumniID,
+                            HobbyID = item
+                        };
+                        _dataContext.AlumniHobbies.InsertOnSubmit(alumniHobby);
+                    }
+                    _dataContext.SubmitChanges();
                 }
-                _dataContext.SubmitChanges();
             }
         }
+
+        public void UpsertAlumni(AlumniDTO alumni)
+        {
+            try
+            {
+                var alumniHobbies = new DataTable();
+                alumniHobbies.Columns.Add("AlumniID", typeof(int));
+                alumniHobbies.Columns.Add("HobbyID", typeof(int));
+
+                foreach (var item in alumni.SelectedHobbies)
+                {
+                    alumniHobbies.Rows.Add(alumni.AlumniID, item);
+                }
+
+                using (var connection = new SqlConnection(_dataContext.Connection.ConnectionString))
+                {
+                    using (var command = new SqlCommand("dbo.UpsertAlumni", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.Add(new SqlParameter("@AlumniID", SqlDbType.Int) { Value = (object)alumni.AlumniID ?? 0 });
+                        command.Parameters.Add(new SqlParameter("@FirstName", SqlDbType.NVarChar, 50) { Value = alumni.FirstName });
+                        command.Parameters.Add(new SqlParameter("@MiddleName", SqlDbType.NVarChar, 50) { Value = (object)alumni.MiddleName ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@LastName", SqlDbType.NVarChar, 50) { Value = alumni.LastName });
+                        command.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 50) { Value = alumni.Email });
+                        command.Parameters.Add(new SqlParameter("@MobileNumber", SqlDbType.NVarChar, 15) { Value = alumni.MobileNumber });
+                        command.Parameters.Add(new SqlParameter("@Address", SqlDbType.NVarChar, 255) { Value = alumni.Address });
+                        command.Parameters.Add(new SqlParameter("@DistrictID", SqlDbType.Int) { Value = alumni.DistrictID });
+                        command.Parameters.Add(new SqlParameter("@DateOfBirth", SqlDbType.Date) { Value = (object)alumni.DateOfBirth ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@GraduationYear", SqlDbType.Int) { Value = alumni.GraduationYear });
+                        command.Parameters.Add(new SqlParameter("@Degree", SqlDbType.NVarChar, 100) { Value = (object)alumni.Degree ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@MajorID", SqlDbType.Int) { Value = alumni.MajorID });
+                        command.Parameters.Add(new SqlParameter("@LinkedInProfile", SqlDbType.NVarChar, 255) { Value = (object)alumni.LinkedInProfile ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@PhotoPath", SqlDbType.NVarChar, 255) { Value = (object)alumni.PhotoPath ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@PhotoName", SqlDbType.NVarChar, 100) { Value = (object)alumni.PhotoName ?? DBNull.Value });
+                        command.Parameters.Add(new SqlParameter("@ModifiedDate", SqlDbType.DateTime) { Value = DateTime.Now });
+                        command.Parameters.Add(new SqlParameter("@AlumniHobbies", SqlDbType.Structured) { TypeName = "dbo.AlumniHobbiesType", Value = alumniHobbies });
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public void UpdateAlumni(AlumniDTO alumni)
         {
@@ -156,36 +210,40 @@ namespace ExamWCF.Services
             data.ModifiedDate = DateTime.Now;
             _dataContext.SubmitChanges();
 
-            //Retrieve hobbies to add and remove
-            var existingHobbies = _dataContext.AlumniHobbies
-                .Where(ah => ah.AlumniID == alumni.AlumniID)
-                .Select(ah => ah.HobbyID)
-                .ToList();
-
-            var hobbiesToAdd = alumni.SelectedHobbies.Except(existingHobbies).ToList();
-            var hobbiesToRemove = existingHobbies.Except(alumni.SelectedHobbies).ToList();
-
-            //Add new hobbies
-            foreach (var hobbyID in hobbiesToAdd)
+            //jika alumni selected hobbies ga kosong, diproses
+            if (alumni.SelectedHobbies != null)
             {
-                var alumniHobby = new AlumniHobby
-                {
-                    AlumniID = alumni.AlumniID,
-                    HobbyID = hobbyID
-                };
-                _dataContext.AlumniHobbies.InsertOnSubmit(alumniHobby);
-                _dataContext.SubmitChanges();
-            }
+                //Retrieve hobbies to add and remove
+                var existingHobbies = _dataContext.AlumniHobbies
+                    .Where(ah => ah.AlumniID == alumni.AlumniID)
+                    .Select(ah => ah.HobbyID)
+                    .ToList();
 
-            //remove old hobbies
-            foreach (var hobbyID in hobbiesToRemove)
-            {
-                var alumniHobby = _dataContext.AlumniHobbies
-                    .FirstOrDefault(ah => ah.AlumniID == alumni.AlumniID && ah.HobbyID == hobbyID);
-                if (alumniHobby != null)
+                var hobbiesToAdd = alumni.SelectedHobbies.Except(existingHobbies).ToList();
+                var hobbiesToRemove = existingHobbies.Except(alumni.SelectedHobbies).ToList();
+
+                //Add new hobbies
+                foreach (var hobbyID in hobbiesToAdd)
                 {
-                    _dataContext.AlumniHobbies.DeleteOnSubmit(alumniHobby);
+                    var alumniHobby = new AlumniHobby
+                    {
+                        AlumniID = alumni.AlumniID,
+                        HobbyID = hobbyID
+                    };
+                    _dataContext.AlumniHobbies.InsertOnSubmit(alumniHobby);
                     _dataContext.SubmitChanges();
+                }
+
+                //remove old hobbies
+                foreach (var hobbyID in hobbiesToRemove)
+                {
+                    var alumniHobby = _dataContext.AlumniHobbies
+                        .FirstOrDefault(ah => ah.AlumniID == alumni.AlumniID && ah.HobbyID == hobbyID);
+                    if (alumniHobby != null)
+                    {
+                        _dataContext.AlumniHobbies.DeleteOnSubmit(alumniHobby);
+                        _dataContext.SubmitChanges();
+                    }
                 }
             }
         }
@@ -193,7 +251,7 @@ namespace ExamWCF.Services
         public void DeleteAlumni(int alumniId)
         {
             var data = _dataContext.Alumnis.FirstOrDefault(a => a.AlumniID == alumniId);
-            _dataContext.Alumnis.DeleteOnSubmit(data);
+            
 
             var alumniHobbies = _dataContext.AlumniHobbies
                 .Where(ah => ah.AlumniID == alumniId)
@@ -211,7 +269,8 @@ namespace ExamWCF.Services
                 _dataContext.AlumniImages.DeleteOnSubmit(item);
                 _dataContext.SubmitChanges();
             }
-                _dataContext.SubmitChanges();
+            _dataContext.Alumnis.DeleteOnSubmit(data);
+            _dataContext.SubmitChanges();
         }
 
         public int GetStateIDByName(string stateName)

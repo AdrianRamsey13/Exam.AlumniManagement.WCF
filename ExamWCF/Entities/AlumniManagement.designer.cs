@@ -78,6 +78,9 @@ namespace ExamWCF.Entities
     partial void InsertJobSkill(JobSkill instance);
     partial void UpdateJobSkill(JobSkill instance);
     partial void DeleteJobSkill(JobSkill instance);
+    partial void InsertJobCandidate(JobCandidate instance);
+    partial void UpdateJobCandidate(JobCandidate instance);
+    partial void DeleteJobCandidate(JobCandidate instance);
     #endregion
 		
 		public AlumniManagementDataContext(string connection) : 
@@ -229,6 +232,14 @@ namespace ExamWCF.Entities
 			get
 			{
 				return this.GetTable<JobSkill>();
+			}
+		}
+		
+		public System.Data.Linq.Table<JobCandidate> JobCandidates
+		{
+			get
+			{
+				return this.GetTable<JobCandidate>();
 			}
 		}
 	}
@@ -1713,6 +1724,8 @@ namespace ExamWCF.Entities
 		
 		private EntitySet<JobAttachment> _JobAttachments;
 		
+		private EntitySet<JobCandidate> _JobCandidates;
+		
 		private EntityRef<District> _District;
 		
 		private EntityRef<Major> _Major;
@@ -1761,6 +1774,7 @@ namespace ExamWCF.Entities
 			this._AlumniImages = new EntitySet<AlumniImage>(new Action<AlumniImage>(this.attach_AlumniImages), new Action<AlumniImage>(this.detach_AlumniImages));
 			this._AlumniHobbies = new EntitySet<AlumniHobby>(new Action<AlumniHobby>(this.attach_AlumniHobbies), new Action<AlumniHobby>(this.detach_AlumniHobbies));
 			this._JobAttachments = new EntitySet<JobAttachment>(new Action<JobAttachment>(this.attach_JobAttachments), new Action<JobAttachment>(this.detach_JobAttachments));
+			this._JobCandidates = new EntitySet<JobCandidate>(new Action<JobCandidate>(this.attach_JobCandidates), new Action<JobCandidate>(this.detach_JobCandidates));
 			this._District = default(EntityRef<District>);
 			this._Major = default(EntityRef<Major>);
 			OnCreated();
@@ -2146,6 +2160,19 @@ namespace ExamWCF.Entities
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Alumni_JobCandidate", Storage="_JobCandidates", ThisKey="AlumniID", OtherKey="AlumniID")]
+		public EntitySet<JobCandidate> JobCandidates
+		{
+			get
+			{
+				return this._JobCandidates;
+			}
+			set
+			{
+				this._JobCandidates.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="District_Alumni", Storage="_District", ThisKey="DistrictID", OtherKey="DistrictID", IsForeignKey=true)]
 		public District District
 		{
@@ -2277,6 +2304,18 @@ namespace ExamWCF.Entities
 		}
 		
 		private void detach_JobAttachments(JobAttachment entity)
+		{
+			this.SendPropertyChanging();
+			entity.Alumni = null;
+		}
+		
+		private void attach_JobCandidates(JobCandidate entity)
+		{
+			this.SendPropertyChanging();
+			entity.Alumni = this;
+		}
+		
+		private void detach_JobCandidates(JobCandidate entity)
 		{
 			this.SendPropertyChanging();
 			entity.Alumni = null;
@@ -2928,6 +2967,8 @@ namespace ExamWCF.Entities
 		
 		private EntitySet<JobSkill> _JobSkills;
 		
+		private EntitySet<JobCandidate> _JobCandidates;
+		
 		private EntityRef<EmploymentType> _EmploymentType;
 		
     #region Extensibility Method Definitions
@@ -2959,6 +3000,7 @@ namespace ExamWCF.Entities
 			this._JobAttachments = new EntitySet<JobAttachment>(new Action<JobAttachment>(this.attach_JobAttachments), new Action<JobAttachment>(this.detach_JobAttachments));
 			this._JobAttachmentTypes = new EntitySet<JobAttachmentType>(new Action<JobAttachmentType>(this.attach_JobAttachmentTypes), new Action<JobAttachmentType>(this.detach_JobAttachmentTypes));
 			this._JobSkills = new EntitySet<JobSkill>(new Action<JobSkill>(this.attach_JobSkills), new Action<JobSkill>(this.detach_JobSkills));
+			this._JobCandidates = new EntitySet<JobCandidate>(new Action<JobCandidate>(this.attach_JobCandidates), new Action<JobCandidate>(this.detach_JobCandidates));
 			this._EmploymentType = default(EntityRef<EmploymentType>);
 			OnCreated();
 		}
@@ -3186,6 +3228,19 @@ namespace ExamWCF.Entities
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="JobPosting_JobCandidate", Storage="_JobCandidates", ThisKey="JobID", OtherKey="JobID")]
+		public EntitySet<JobCandidate> JobCandidates
+		{
+			get
+			{
+				return this._JobCandidates;
+			}
+			set
+			{
+				this._JobCandidates.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="EmploymentType_JobPosting", Storage="_EmploymentType", ThisKey="EmploymentTypeID", OtherKey="EmploymentTypeID", IsForeignKey=true)]
 		public EmploymentType EmploymentType
 		{
@@ -3271,6 +3326,18 @@ namespace ExamWCF.Entities
 		}
 		
 		private void detach_JobSkills(JobSkill entity)
+		{
+			this.SendPropertyChanging();
+			entity.JobPosting = null;
+		}
+		
+		private void attach_JobCandidates(JobCandidate entity)
+		{
+			this.SendPropertyChanging();
+			entity.JobPosting = this;
+		}
+		
+		private void detach_JobCandidates(JobCandidate entity)
 		{
 			this.SendPropertyChanging();
 			entity.JobPosting = null;
@@ -3696,6 +3763,198 @@ namespace ExamWCF.Entities
 						this._SkillID = default(byte);
 					}
 					this.SendPropertyChanged("Skill");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.JobCandidate")]
+	public partial class JobCandidate : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _AlumniID;
+		
+		private System.Guid _JobID;
+		
+		private System.DateTime _ApplyDate;
+		
+		private EntityRef<Alumni> _Alumni;
+		
+		private EntityRef<JobPosting> _JobPosting;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnAlumniIDChanging(int value);
+    partial void OnAlumniIDChanged();
+    partial void OnJobIDChanging(System.Guid value);
+    partial void OnJobIDChanged();
+    partial void OnApplyDateChanging(System.DateTime value);
+    partial void OnApplyDateChanged();
+    #endregion
+		
+		public JobCandidate()
+		{
+			this._Alumni = default(EntityRef<Alumni>);
+			this._JobPosting = default(EntityRef<JobPosting>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_AlumniID", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int AlumniID
+		{
+			get
+			{
+				return this._AlumniID;
+			}
+			set
+			{
+				if ((this._AlumniID != value))
+				{
+					if (this._Alumni.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnAlumniIDChanging(value);
+					this.SendPropertyChanging();
+					this._AlumniID = value;
+					this.SendPropertyChanged("AlumniID");
+					this.OnAlumniIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JobID", DbType="UniqueIdentifier NOT NULL", IsPrimaryKey=true)]
+		public System.Guid JobID
+		{
+			get
+			{
+				return this._JobID;
+			}
+			set
+			{
+				if ((this._JobID != value))
+				{
+					if (this._JobPosting.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnJobIDChanging(value);
+					this.SendPropertyChanging();
+					this._JobID = value;
+					this.SendPropertyChanged("JobID");
+					this.OnJobIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ApplyDate", DbType="DateTime NOT NULL")]
+		public System.DateTime ApplyDate
+		{
+			get
+			{
+				return this._ApplyDate;
+			}
+			set
+			{
+				if ((this._ApplyDate != value))
+				{
+					this.OnApplyDateChanging(value);
+					this.SendPropertyChanging();
+					this._ApplyDate = value;
+					this.SendPropertyChanged("ApplyDate");
+					this.OnApplyDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Alumni_JobCandidate", Storage="_Alumni", ThisKey="AlumniID", OtherKey="AlumniID", IsForeignKey=true)]
+		public Alumni Alumni
+		{
+			get
+			{
+				return this._Alumni.Entity;
+			}
+			set
+			{
+				Alumni previousValue = this._Alumni.Entity;
+				if (((previousValue != value) 
+							|| (this._Alumni.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Alumni.Entity = null;
+						previousValue.JobCandidates.Remove(this);
+					}
+					this._Alumni.Entity = value;
+					if ((value != null))
+					{
+						value.JobCandidates.Add(this);
+						this._AlumniID = value.AlumniID;
+					}
+					else
+					{
+						this._AlumniID = default(int);
+					}
+					this.SendPropertyChanged("Alumni");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="JobPosting_JobCandidate", Storage="_JobPosting", ThisKey="JobID", OtherKey="JobID", IsForeignKey=true)]
+		public JobPosting JobPosting
+		{
+			get
+			{
+				return this._JobPosting.Entity;
+			}
+			set
+			{
+				JobPosting previousValue = this._JobPosting.Entity;
+				if (((previousValue != value) 
+							|| (this._JobPosting.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._JobPosting.Entity = null;
+						previousValue.JobCandidates.Remove(this);
+					}
+					this._JobPosting.Entity = value;
+					if ((value != null))
+					{
+						value.JobCandidates.Add(this);
+						this._JobID = value.JobID;
+					}
+					else
+					{
+						this._JobID = default(System.Guid);
+					}
+					this.SendPropertyChanged("JobPosting");
 				}
 			}
 		}
