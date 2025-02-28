@@ -60,7 +60,7 @@ namespace ExamWCF.Services
                             //SelectedJobAttachments = jas.Select(h => h.AlumniID).ToList()
                             Candidates = jas.Select(h => h.AlumniID).Distinct().Count(),
                             SelectedCandidates = candidates.Select(jc => jc.AlumniID).ToList(),
-                            TotalCandidates = jp.JobCandidates.Count()
+                            TotalCandidates = candidates.Count()
                         };
             var jobs = query.ToList().OrderByDescending(a => a.ModifiedDate);
             return jobs;
@@ -273,12 +273,8 @@ namespace ExamWCF.Services
 
         public void InsertJobCandidate(JobCandidateDTO jobCandidate)
         {
-            var jobCandidates = new JobCandidate
-            {
-                AlumniID = jobCandidate.AlumniID,
-                JobID = jobCandidate.JobID,
-                ApplyDate = DateTime.Now
-            };
+            var jobCandidates = Mapping.Mapper.Map<JobCandidate>(jobCandidate);
+            jobCandidates.ApplyDate = DateTime.Now; // Jika ApplyDate tidak ada di DTO
 
             _dataContext.JobCandidates.InsertOnSubmit(jobCandidates);
             _dataContext.SubmitChanges();
@@ -352,6 +348,8 @@ namespace ExamWCF.Services
                 FullName = d.Alumni.FirstName + " " + (d.Alumni.MiddleName ?? "") + " " + d.Alumni.LastName,
                 JobAttachments = d.JobPosting.JobAttachments.Where(ja => ja.AlumniID == d.AlumniID).Select(ja => new JobAttachmentDTO
                 {
+                    AttachmentID = ja.AttachmentID,
+                    AttachmentTypeDisplay = ja.AttachmentType.Name,
                     FilePath = ja.FilePath,
                     FileName = ja.FileName,
                 }

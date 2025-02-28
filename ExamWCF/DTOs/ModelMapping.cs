@@ -42,6 +42,9 @@ namespace ExamWCF.DTOs
             CreateMap<JobSkill, JobSkillDTO>().ReverseMap();
             CreateMap<Skill, SkillsDTO>().ReverseMap();
             CreateMap<JobCandidate, JobCandidateDTO>().ReverseMap();
+            CreateMap<Event, EventDTO>().ReverseMap();
+            CreateMap<PhotoAlbum, PhotoAlbumDTO>().ReverseMap();
+            CreateMap<Photo, PhotoDTO>().ReverseMap();
         }
     }
 }

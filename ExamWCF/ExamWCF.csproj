@@ -90,12 +90,15 @@
     <Content Include="Services\AlumniImageService.svc" />
     <Content Include="Services\AlumniService.svc" />
     <Content Include="Services\CandidateService.svc" />
+    <Content Include="Services\EventService.svc" />
     <Content Include="Services\FacultyService.svc" />
     <Content Include="Services\JobApplicationService.svc" />
     <Content Include="Services\JobAttachmentService.svc" />
     <Content Include="Services\JobHistoryService.svc" />
     <Content Include="Services\JobPostingService.svc" />
     <Content Include="Services\MajorService.svc" />
+    <Content Include="Services\PhotoAlbumService.svc" />
+    <Content Include="Services\PhotoService.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +107,7 @@
     <Compile Include="DTOs\AttachmentTypeDTO.cs" />
     <Compile Include="DTOs\DistrictDTO.cs" />
     <Compile Include="DTOs\EmploymentTypeDTO.cs" />
+    <Compile Include="DTOs\EventDTO.cs" />
     <Compile Include="DTOs\FacultyDTO.cs" />
     <Compile Include="DTOs\HobbyDTO.cs" />
     <Compile Include="DTOs\JobAttachmentDTO.cs" />
@@ -114,6 +118,8 @@
     <Compile Include="DTOs\JobSkillDTO.cs" />
     <Compile Include="DTOs\MajorDTO.cs" />
     <Compile Include="DTOs\ModelMapping.cs" />
+    <Compile Include="DTOs\PhotoAlbumDTO.cs" />
+    <Compile Include="DTOs\PhotoDTO.cs" />
     <Compile Include="DTOs\SkillsDTO.cs" />
     <Compile Include="DTOs\StateDTO.cs" />
     <Compile Include="Entities\AlumniManagement.designer.cs">
@@ -135,18 +141,24 @@
     <Compile Include="Services\CandidateService.svc.cs">
       <DependentUpon>CandidateService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Services\EventService.svc.cs">
+      <DependentUpon>EventService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Services\FacultyService.svc.cs">
       <DependentUpon>FacultyService.svc</DependentUpon>
     </Compile>
     <Compile Include="Services\IAlumniImageService.cs" />
     <Compile Include="Services\IAlumniService.cs" />
     <Compile Include="Services\ICandidateService.cs" />
+    <Compile Include="Services\IEventService.cs" />
     <Compile Include="Services\IFacultyService.cs" />
     <Compile Include="Services\IJobApplicationService.cs" />
     <Compile Include="Services\IJobAttachmentService.cs" />
     <Compile Include="Services\IJobHistoryService.cs" />
     <Compile Include="Services\IJobPostingService.cs" />
     <Compile Include="Services\IMajorService.cs" />
+    <Compile Include="Services\IPhotoAlbumService.cs" />
+    <Compile Include="Services\IPhotoService.cs" />
     <Compile Include="Services\JobApplicationService.svc.cs">
       <DependentUpon>JobApplicationService.svc</DependentUpon>
     </Compile>
@@ -161,6 +173,12 @@
     </Compile>
     <Compile Include="Services\MajorService.svc.cs">
       <DependentUpon>MajorService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\PhotoAlbumService.svc.cs">
+      <DependentUpon>PhotoAlbumService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\PhotoService.svc.cs">
+      <DependentUpon>PhotoService.svc</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

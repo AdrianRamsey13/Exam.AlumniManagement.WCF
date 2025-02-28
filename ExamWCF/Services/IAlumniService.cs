@@ -41,6 +41,9 @@ namespace ExamWCF.Services
         void ImportFromExcel(AlumniDTO alumni);
 
         [OperationContract]
+        void UpsertMultipleAlumni(List<AlumniDTO> alumnis);
+
+        [OperationContract]
         void UpsertAlumni(AlumniDTO alumni);
     }
 }

@@ -38,15 +38,13 @@ namespace ExamWCF.Services
                         join m in _dataContext.Majors on a.MajorID equals m.MajorID
                         join f in _dataContext.Faculties on m.FacultyID equals f.FacultyID
                         join h in _dataContext.AlumniHobbies on a.AlumniID equals h.AlumniID into hobbies
-                        //join i in _dataContext.AlumniImages on a.AlumniID equals i.AlumniID into images
-                        //join j in _dataContext.JobHistories on a.AlumniID equals j.AlumniID into jobHistories
-                        //join hb in _dataContext.AlumniHobbies on a.AlumniID equals hb.AlumniID into hobbies
                         select new AlumniDTO
                         {
                             AlumniID = a.AlumniID,
                             FirstName = a.FirstName,
                             MiddleName = a.MiddleName,
                             LastName = a.LastName,
+                            Gender = a.Gender,
                             Email = a.Email,
                             MobileNumber = a.MobileNumber,
                             Address = a.Address,
@@ -176,6 +174,7 @@ namespace ExamWCF.Services
                         command.Parameters.Add(new SqlParameter("@FirstName", SqlDbType.NVarChar, 50) { Value = alumni.FirstName });
                         command.Parameters.Add(new SqlParameter("@MiddleName", SqlDbType.NVarChar, 50) { Value = (object)alumni.MiddleName ?? DBNull.Value });
                         command.Parameters.Add(new SqlParameter("@LastName", SqlDbType.NVarChar, 50) { Value = alumni.LastName });
+                        command.Parameters.Add(new SqlParameter("@Gender", SqlDbType.VarChar, 10) { Value = alumni.Gender });
                         command.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 50) { Value = alumni.Email });
                         command.Parameters.Add(new SqlParameter("@MobileNumber", SqlDbType.NVarChar, 15) { Value = alumni.MobileNumber });
                         command.Parameters.Add(new SqlParameter("@Address", SqlDbType.NVarChar, 255) { Value = alumni.Address });
@@ -287,14 +286,7 @@ namespace ExamWCF.Services
 
         public void ImportFromExcel(AlumniDTO alumni)
         {
-            if (CheckAlumniID(alumni.AlumniID))
-            {
-                UpdateAlumni(alumni);
-            }
-            else
-            {
-                InsertAlumni(alumni);
-            }
+            UpsertMultipleAlumni(new List<AlumniDTO> { alumni });
         }
 
         private bool CheckAlumniID(int id)
@@ -305,6 +297,85 @@ namespace ExamWCF.Services
                 if (item.AlumniID == id) return true;
             }
             return false;
+        }
+
+        public void UpsertMultipleAlumni(List<AlumniDTO> alumniDTO)
+        {
+            try
+            {
+                var alumniTable = new DataTable();
+                alumniTable.Columns.Add("AlumniID", typeof(int));
+                alumniTable.Columns.Add("FirstName", typeof(string));
+                alumniTable.Columns.Add("MiddleName", typeof(string));
+                alumniTable.Columns.Add("LastName", typeof(string));
+                alumniTable.Columns.Add("Gender", typeof(string));
+                alumniTable.Columns.Add("Email", typeof(string));
+                alumniTable.Columns.Add("MobileNumber", typeof(string));
+                alumniTable.Columns.Add("Address", typeof(string));
+                alumniTable.Columns.Add("DistrictID", typeof(int));
+                alumniTable.Columns.Add("DateOfBirth", typeof(DateTime));
+                alumniTable.Columns.Add("GraduationYear", typeof(int));
+                alumniTable.Columns.Add("Degree", typeof(string));
+                alumniTable.Columns.Add("MajorID", typeof(int));
+                alumniTable.Columns.Add("LinkedInProfile", typeof(string));
+
+                var hobbiesTable = new DataTable();
+                hobbiesTable.Columns.Add("AlumniID", typeof(int));
+                hobbiesTable.Columns.Add("HobbyID", typeof(int));
+
+                bool hasHobbies = false; // Flag to check if there are hobbies
+
+                foreach (var alumni in alumniDTO)
+                {
+                    alumniTable.Rows.Add(
+                        alumni.AlumniID, alumni.FirstName, alumni.MiddleName, alumni.LastName, alumni.Gender, alumni.Email,
+                        alumni.MobileNumber, alumni.Address, alumni.DistrictID, alumni.DateOfBirth ?? (object)DBNull.Value,
+                        alumni.GraduationYear, alumni.Degree, alumni.MajorID, alumni.LinkedInProfile
+                    );
+
+                    if (alumni.SelectedHobbies != null && alumni.SelectedHobbies.Any()) // Check if hobbies exist
+                    {
+                        hasHobbies = true;
+                        foreach (var hobby in alumni.SelectedHobbies)
+                        {
+                            hobbiesTable.Rows.Add(alumni.AlumniID, hobby);
+                        }
+                    }
+                }
+
+                using (var connection = new SqlConnection(_dataContext.Connection.ConnectionString))
+                {
+                    using (var command = new SqlCommand("dbo.UpsertMultipleAlumni", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        var alumniParam = new SqlParameter("@AlumniList", SqlDbType.Structured)
+                        {
+                            TypeName = "dbo.AlumniType",
+                            Value = alumniTable
+                        };
+                        command.Parameters.Add(alumniParam);
+
+                        if (hasHobbies) // Only add this parameter if hobbies exist
+                        {
+                            var hobbiesParam = new SqlParameter("@AlumniHobbies", SqlDbType.Structured)
+                            {
+                                TypeName = "dbo.AlumniHobbiesType",
+                                Value = hobbiesTable
+                            };
+                            command.Parameters.Add(hobbiesParam);
+                        }
+
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in UpsertMultipleAlumni: " + ex.Message);
+            }
         }
     }
 }
