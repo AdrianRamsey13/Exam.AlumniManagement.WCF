@@ -22,6 +22,6 @@ namespace ExamWCF.Services
         void InsertPhoto(PhotoDTO photo, int AlbumID);
 
         [OperationContract]
-        void DeletePhoto(int AlbumID,int id);
+        void DeletePhoto(int id);
     }
 }

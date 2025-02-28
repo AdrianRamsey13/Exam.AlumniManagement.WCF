@@ -60,7 +60,7 @@ namespace ExamWCF.Services
             _dataContext.SubmitChanges();
         }
 
-        public void DeletePhoto(int AlbumID, int id)
+        public void DeletePhoto(int id)
         {
             var data = _dataContext.Photos.FirstOrDefault(p => p.PhotoID == id);
             _dataContext.Photos.DeleteOnSubmit(data);

@@ -26,14 +26,32 @@ namespace ExamWCF.Services
 
         public IEnumerable<PhotoAlbumDTO> GetPhotoAlbums()
         {
-            var query = from p in _dataContext.PhotoAlbums
-                        select new PhotoAlbumDTO
+            var albums = new List<PhotoAlbumDTO>();
+
+            using (var connection = new SqlConnection(_dataContext.Connection.ConnectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand("GetPhotoAlbums", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            AlbumID = p.AlbumID,
-                            AlbumName = p.AlbumName,
-                            ModifiedDate = p.ModifiedDate
-                        };
-            return query.ToList().OrderByDescending(p => p.ModifiedDate);
+                            albums.Add(new PhotoAlbumDTO
+                            {
+                                AlbumID = reader.GetInt32(reader.GetOrdinal("AlbumID")),
+                                AlbumName = reader.GetString(reader.GetOrdinal("AlbumName")),
+                                ModifiedDate = reader.GetDateTime(reader.GetOrdinal("ModifiedDate")),
+                                
+                            });
+                        }
+                    }
+                }
+            }
+
+            return albums;
         }
 
         public PhotoAlbumDTO GetPhotoAlbumById(int photoAlbumId)
