@@ -13,18 +13,15 @@ namespace ExamWCF.Services
     public interface IPhotoService
     {
         [OperationContract]
-        IEnumerable<PhotoDTO> GetPhotos();
+        IEnumerable<PhotoDTO> GetPhotos(int AlbumID);
 
         [OperationContract]
-        PhotoDTO GetPhotoByID(int id);
+        PhotoDTO GetPhotoByID(int AlbumID,int id);
 
         [OperationContract]
-        void InsertPhoto(PhotoDTO photo);
+        void InsertPhoto(PhotoDTO photo, int AlbumID);
 
         [OperationContract]
-        void UpdatePhoto(PhotoDTO photo);
-
-        [OperationContract]
-        void DeletePhoto(int id);
+        void DeletePhoto(int AlbumID,int id);
     }
 }

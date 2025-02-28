@@ -9,6 +9,8 @@ namespace ExamWCF.DTOs
     {
         public int PhotoID { get; set; }
         public int AlbumID { get; set; }
+
+        public string AlbumName { get; set; }
         public string PhotoPath { get; set; }
         public string PhotoFileName { get; set; }
         public bool? IsPhotoAlbumThumbnail { get; set; }
