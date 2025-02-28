@@ -24,6 +24,25 @@ namespace ExamWCF.Services
             _dataContext = new AlumniManagementDataContext(connectionStringSettings);
         }
 
+        public IEnumerable<PhotoDTO> GetAllPhotos()
+        {
+            return (from photo in _dataContext.Photos
+                    join album in _dataContext.PhotoAlbums
+                    on photo.AlbumID equals album.AlbumID
+                    select new PhotoDTO
+                    {
+                        PhotoID = photo.PhotoID,
+                        AlbumID = album.AlbumID,
+                        AlbumName = album.AlbumName,
+                        PhotoPath = photo.PhotoPath,
+                        PhotoFileName = photo.PhotoFileName,
+                        IsPhotoAlbumThumbnail = photo.IsPhotoAlbumThumbnail,
+                        ModifiedDate = photo.ModifiedDate
+                    })
+                    .OrderByDescending(p => p.ModifiedDate)
+                    .ToList();
+        }
+
         public IEnumerable<PhotoDTO> GetPhotos(int AlbumID)
         {
             return (from photo in _dataContext.Photos
@@ -54,6 +73,11 @@ namespace ExamWCF.Services
         public void InsertPhoto(PhotoDTO photo, int AlbumID)
         {
             var data = Mapping.Mapper.Map<Photo>(photo);
+
+            // Cek apakah sudah ada foto dalam album
+            bool isFirstPhoto = !_dataContext.Photos.Any(p => p.AlbumID == AlbumID);
+
+            data.IsPhotoAlbumThumbnail = isFirstPhoto; // True jika ini adalah foto pertama, false jika tidak
             data.ModifiedDate = DateTime.Now;
 
             _dataContext.Photos.InsertOnSubmit(data);
@@ -64,6 +88,18 @@ namespace ExamWCF.Services
         {
             var data = _dataContext.Photos.FirstOrDefault(p => p.PhotoID == id);
             _dataContext.Photos.DeleteOnSubmit(data);
+            _dataContext.SubmitChanges();
+        }
+
+        public void SetThumbnail(int id, int albumID)
+        {
+            var photos = _dataContext.Photos.Where(p => p.AlbumID == albumID);
+            var previousThumbnail = photos.FirstOrDefault(p => p.IsPhotoAlbumThumbnail == true);
+            previousThumbnail.IsPhotoAlbumThumbnail = false;
+            foreach (var photo in photos)
+            {
+                photo.IsPhotoAlbumThumbnail = photo.PhotoID == id;
+            }
             _dataContext.SubmitChanges();
         }
     }

@@ -13,6 +13,9 @@ namespace ExamWCF.Services
     public interface IPhotoService
     {
         [OperationContract]
+        IEnumerable<PhotoDTO> GetAllPhotos();
+
+        [OperationContract]
         IEnumerable<PhotoDTO> GetPhotos(int AlbumID);
 
         [OperationContract]
@@ -23,5 +26,8 @@ namespace ExamWCF.Services
 
         [OperationContract]
         void DeletePhoto(int id);
+
+        [OperationContract]
+        void SetThumbnail(int id, int albumID);
     }
 }
