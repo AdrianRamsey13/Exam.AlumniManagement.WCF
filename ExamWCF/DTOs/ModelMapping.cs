@@ -45,6 +45,13 @@ namespace ExamWCF.DTOs
             CreateMap<Event, EventDTO>().ReverseMap();
             CreateMap<PhotoAlbum, PhotoAlbumDTO>().ReverseMap();
             CreateMap<Photo, PhotoDTO>().ReverseMap();
+            CreateMap<AspNetRole, AspNetUserDTO.RoleDTO>().ReverseMap();
+            CreateMap<AspNetUser, AspNetUserDTO.UserDTO>().ReverseMap();
+            CreateMap<AspNetPermission, AspNetUserDTO.PermissionDTO>().ReverseMap();
+            CreateMap<AspNetRolePermission, AspNetUserDTO.RolePermissionDTO>().ReverseMap();
+            CreateMap<AspNetUserRole, AspNetUserDTO.UserRoleDTO>().ReverseMap();
+            CreateMap<AspNetUserClaim, AspNetUserDTO.UserClaimDTO>().ReverseMap();
+            CreateMap<AspNetUserLogin, AspNetUserDTO.UserLoginDTO>().ReverseMap();
         }
     }
 }

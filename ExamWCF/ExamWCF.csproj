@@ -49,6 +49,7 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -99,11 +100,13 @@
     <Content Include="Services\MajorService.svc" />
     <Content Include="Services\PhotoAlbumService.svc" />
     <Content Include="Services\PhotoService.svc" />
+    <Content Include="Services\UserManagementService.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\AlumniDTO.cs" />
     <Compile Include="DTOs\AlumniImageDTO.cs" />
+    <Compile Include="DTOs\AspNetUserDTO.cs" />
     <Compile Include="DTOs\AttachmentTypeDTO.cs" />
     <Compile Include="DTOs\DistrictDTO.cs" />
     <Compile Include="DTOs\EmploymentTypeDTO.cs" />
@@ -159,6 +162,7 @@
     <Compile Include="Services\IMajorService.cs" />
     <Compile Include="Services\IPhotoAlbumService.cs" />
     <Compile Include="Services\IPhotoService.cs" />
+    <Compile Include="Services\IUserManagementService.cs" />
     <Compile Include="Services\JobApplicationService.svc.cs">
       <DependentUpon>JobApplicationService.svc</DependentUpon>
     </Compile>
@@ -179,6 +183,9 @@
     </Compile>
     <Compile Include="Services\PhotoService.svc.cs">
       <DependentUpon>PhotoService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\UserManagementService.svc.cs">
+      <DependentUpon>UserManagementService.svc</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
